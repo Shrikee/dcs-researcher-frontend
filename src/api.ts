@@ -25,6 +25,9 @@ export async function streamResearch(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Accept: 'text/event-stream',
+      'Accept-Encoding': 'identity',
+      'Cache-Control': 'no-cache',
       ...(API_KEY && { Authorization: `Bearer ${API_KEY}` }),
     },
     body: JSON.stringify({ question }),
