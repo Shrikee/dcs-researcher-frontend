@@ -1,0 +1,11 @@
+.agents
+skills
+node_modules
+dist
+.DS_Store
+*.local
+.env
+.env.local
+.env.*.local
+.claude
+.vscode
