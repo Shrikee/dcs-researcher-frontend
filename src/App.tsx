@@ -9,6 +9,7 @@ import { Sidebar } from './components/Sidebar';
 import { InputBar } from './components/InputBar';
 import { EmptyState } from './components/EmptyState';
 import { UndoToast } from './components/UndoToast';
+import { Analytics } from '@vercel/analytics/react';
 import type { ChatSession } from './types';
 
 export default function App() {
@@ -128,6 +129,7 @@ export default function App() {
           onDismiss={handleDismissToast}
         />
       )}
+      <Analytics />
     </div>
   );
 }
