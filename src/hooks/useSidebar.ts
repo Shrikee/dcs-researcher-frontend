@@ -21,7 +21,9 @@ export function useIsMobile() {
 
 export function useSidebar() {
   const isMobile = useIsMobile();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(
+    () => !window.matchMedia('(max-width: 1023px)').matches,
+  );
 
   const close = useCallback(() => setOpen(false), []);
   const toggle = useCallback(() => setOpen((v) => !v), []);
