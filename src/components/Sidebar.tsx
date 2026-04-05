@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { ChatSession, Theme } from '../types';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -88,7 +89,10 @@ export function Sidebar({
             {sessions.length} session{sessions.length !== 1 ? 's' : ''}
           </span>
         )}
-        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        <div className="sidebar__footer-actions">
+          <Link to="/about" className="sidebar__about-link">About</Link>
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        </div>
       </div>
     </aside>
   );
