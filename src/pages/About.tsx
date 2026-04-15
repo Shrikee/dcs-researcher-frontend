@@ -1,11 +1,62 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useTheme } from '../hooks/useTheme';
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is DCS World?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Digital Combat Simulator (DCS) World is a free-to-play combat flight simulator developed by Eagle Dynamics. Known for its unparalleled fidelity, DCS World recreates modern and Cold War-era military aircraft with study-level accuracy — from fully clickable cockpits and realistic avionics to authentic flight models and weapons systems."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is DCS Researcher?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DCS Researcher is an AI-powered assistant purpose-built for DCS World pilots. Ask about startup procedures, radar modes, countermeasure programs, navigation waypoints, or any aircraft system — and get clear, accurate answers in seconds."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What DCS modules and aircraft are supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DCS Researcher covers the full range of DCS World modules including the F-16C Viper, F/A-18C Hornet, F-15E Strike Eagle, F-14 Tomcat, A-10C II Warthog, Mirage F1, Mirage 2000C, JF-17 Thunder, Eurofighter Typhoon, Su-27 Flanker, Ka-50 Black Shark, AH-64D Apache, P-51D Mustang, and all major maps including Caucasus, Persian Gulf, Syria, and Sinai."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What questions can I ask DCS Researcher?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can ask about cold start procedures, weapons employment like AGM-65 Mavericks, radar modes (RWS vs TWS), TACAN and ILS approaches, countermeasure programming, Mission Editor scripting, HOTAS bindings, multiplayer server setup, SRS configuration, and any other DCS World topic."
+      }
+    }
+  ]
+};
 
 export function About() {
   const { theme, toggle: toggleTheme } = useTheme();
 
   return (
     <div className="about-page" data-theme={theme}>
+      <Helmet>
+        <title>About DCS World — DCS Researcher AI Assistant for Flight Simulator Pilots</title>
+        <meta name="description" content="Learn about DCS World by Eagle Dynamics — the premier combat flight simulator — and how DCS Researcher helps pilots master aircraft systems, weapons employment, and mission planning with AI-powered instant answers." />
+        <link rel="canonical" href="https://dcs-researcher.dev/about" />
+        <meta property="og:title" content="About DCS World — DCS Researcher AI Assistant" />
+        <meta property="og:description" content="Learn about DCS World by Eagle Dynamics and how DCS Researcher helps flight simulator pilots master aircraft systems, weapons, and mission planning." />
+        <meta property="og:url" content="https://dcs-researcher.dev/about" />
+        <meta name="twitter:title" content="About DCS World — DCS Researcher AI Assistant" />
+        <meta name="twitter:description" content="Learn about DCS World by Eagle Dynamics and how DCS Researcher helps flight simulator pilots master aircraft systems, weapons, and mission planning." />
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+      </Helmet>
       <header className="about-header">
         <div className="about-header__inner">
           <Link to="/" className="about-header__brand">

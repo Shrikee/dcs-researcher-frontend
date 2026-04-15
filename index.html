@@ -4,12 +4,79 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>DCS Researcher</title>
+
+    <!-- Static SEO (not overridden per-page) -->
+    <meta name="keywords" content="DCS World, Digital Combat Simulator, Eagle Dynamics, flight simulator, AI assistant, DCS guide, F-16C Viper, F/A-18C Hornet, A-10C Warthog, DCS help, combat flight sim" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="DCS Researcher" />
+    <meta name="application-name" content="DCS Researcher" />
+
+    <!-- Open Graph (static — per-page tags managed by Helmet) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="DCS Researcher" />
+    <meta property="og:image" content="https://dcs-researcher.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="DCS Researcher — AI Research Assistant for Digital Combat Simulator" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card (static — per-page tags managed by Helmet) -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://dcs-researcher.dev/og-image.png" />
+    <meta name="twitter:image:alt" content="DCS Researcher — AI Research Assistant for DCS World" />
+
+    <!-- Theme & Mobile -->
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Favicon & Manifest -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "DCS Researcher",
+      "url": "https://dcs-researcher.dev",
+      "description": "AI-powered research assistant for Digital Combat Simulator (DCS World) by Eagle Dynamics. Get instant answers about aircraft systems, weapons employment, and mission planning.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "DCS Researcher"
+      },
+      "about": {
+        "@type": "VideoGame",
+        "name": "DCS World",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Eagle Dynamics"
+        },
+        "genre": "Combat Flight Simulator",
+        "gamePlatform": "PC"
+      }
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

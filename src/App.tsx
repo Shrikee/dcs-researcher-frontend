@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useTheme } from './hooks/useTheme';
 import { useSidebar } from './hooks/useSidebar';
 import { useChatSessions } from './hooks/useChatSessions';
@@ -83,6 +84,16 @@ export default function App() {
 
   return (
     <div className="app">
+      <Helmet>
+        <title>DCS Researcher — AI Assistant for Digital Combat Simulator (DCS World)</title>
+        <meta name="description" content="DCS Researcher is an AI-powered research assistant for Digital Combat Simulator (DCS World) by Eagle Dynamics. Get instant answers about aircraft systems, weapons employment, startup procedures, and mission planning for the F-16C, F/A-18C, A-10C, and all DCS modules." />
+        <link rel="canonical" href="https://dcs-researcher.dev/" />
+        <meta property="og:title" content="DCS Researcher — AI Assistant for Digital Combat Simulator" />
+        <meta property="og:description" content="AI-powered research assistant for DCS World by Eagle Dynamics. Instant answers about aircraft systems, weapons, avionics, and mission planning for every DCS module." />
+        <meta property="og:url" content="https://dcs-researcher.dev/" />
+        <meta name="twitter:title" content="DCS Researcher — AI Assistant for Digital Combat Simulator" />
+        <meta name="twitter:description" content="AI-powered research assistant for DCS World. Get instant answers about aircraft systems, weapons, and procedures for every DCS module by Eagle Dynamics." />
+      </Helmet>
       <div
         className={`sidebar-backdrop ${!sidebar.open ? 'sidebar-backdrop--hidden' : ''}`}
         onClick={sidebar.close}
