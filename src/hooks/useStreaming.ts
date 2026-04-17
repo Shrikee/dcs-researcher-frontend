@@ -49,12 +49,22 @@ export function useStreaming(deps: StreamingDeps) {
 
       lastQuestionRef.current = question;
       let backendSessionId = deps.activeSessionId;
+      const isLocalPending = backendSessionId?.startsWith('pending-') ?? false;
 
       if (!backendSessionId) {
+        // Brand new session — no local session exists yet
         const pendingId = deps.createSession(question, userMsg, assistantMsg);
         streamSessionRef.current = pendingId;
         backendSessionId = null;
+      } else if (isLocalPending) {
+        // Session exists locally but never reached the backend (previous fetch failed
+        // before the server returned a session event). Append to the local session but
+        // send to the backend as a fresh request so it can create a real session.
+        streamSessionRef.current = backendSessionId;
+        deps.appendMessages(backendSessionId, userMsg, assistantMsg);
+        backendSessionId = null;
       } else {
+        // Existing backend session — continue it normally
         streamSessionRef.current = backendSessionId;
         deps.appendMessages(backendSessionId, userMsg, assistantMsg);
       }
