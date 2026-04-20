@@ -713,6 +713,24 @@ body {
   30% { opacity: 1; transform: scale(1.1); }
 }
 
+/* Slow-response hint: shown after ~30s of waiting with no tokens yet */
+.message__slow-hint {
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 2px solid var(--accent-dim);
+  background: color-mix(in oklab, var(--accent) 6%, transparent);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  animation: slow-hint-in var(--dur-normal) var(--ease-out);
+}
+
+@keyframes slow-hint-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ============================================================
    INPUT BAR
    ============================================================ */

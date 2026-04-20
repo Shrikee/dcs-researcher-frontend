@@ -15,6 +15,7 @@ export const MessageItem = memo(function MessageItem({ message, isStreaming, onR
   const hasError = !!message.error;
   const wasStreaming = useRef(false);
   const [justCompleted, setJustCompleted] = useState(false);
+  const [showSlowHint, setShowSlowHint] = useState(false);
 
   useEffect(() => {
     if (isCurrentlyStreaming) {
@@ -25,6 +26,15 @@ export const MessageItem = memo(function MessageItem({ message, isStreaming, onR
       const timer = setTimeout(() => setJustCompleted(false), 800);
       return () => clearTimeout(timer);
     }
+  }, [isCurrentlyStreaming, message.content, hasError]);
+
+  // Show a friendly hint if the user has been waiting a while with no content yet.
+  useEffect(() => {
+    if (isCurrentlyStreaming && !message.content && !hasError) {
+      const timer = setTimeout(() => setShowSlowHint(true), 30_000);
+      return () => clearTimeout(timer);
+    }
+    setShowSlowHint(false);
   }, [isCurrentlyStreaming, message.content, hasError]);
 
   return (
@@ -69,11 +79,19 @@ export const MessageItem = memo(function MessageItem({ message, isStreaming, onR
 
       {/* Loading indicator: streaming but no content yet */}
       {isCurrentlyStreaming && !message.content && !hasError && (
-        <div className="message__loading" aria-label="Researcher is thinking">
-          <span className="message__loading-dot" />
-          <span className="message__loading-dot" />
-          <span className="message__loading-dot" />
-        </div>
+        <>
+          <div className="message__loading" aria-label="Researcher is thinking">
+            <span className="message__loading-dot" />
+            <span className="message__loading-dot" />
+            <span className="message__loading-dot" />
+          </div>
+          {showSlowHint && (
+            <p className="message__slow-hint" role="status">
+              Still researching — this one runs on modest local hardware, so
+              deeper questions take a little longer. Thanks for hanging in.
+            </p>
+          )}
+        </>
       )}
 
       <div className="message__body">
