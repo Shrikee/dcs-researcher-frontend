@@ -25,10 +25,11 @@ export async function streamResearch(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'text/event-stream',
       'Accept-Encoding': 'identity',
       'Cache-Control': 'no-cache',
-      ...(API_KEY && { Authorization: `Bearer ${API_KEY}` }),
+      'X-Accel-Buffering': 'no',
+      'Connection': 'keep-alive',
+      ...(API_KEY && { 'Authorization': `Bearer ${API_KEY}` }),
     },
     body: JSON.stringify({ question }),
     signal,
@@ -56,9 +57,30 @@ export async function streamResearch(
 
   resetHeartbeat();
 
+  const t0 = performance.now();
+  const diag: Array<Record<string, unknown>> = [];
+  (window as unknown as { __streamDiag?: unknown }).__streamDiag = diag;
+  diag.push({
+    kind: 'headers',
+    status: response.status,
+    contentType: response.headers.get('content-type'),
+    contentLength: response.headers.get('content-length'),
+    contentEncoding: response.headers.get('content-encoding'),
+    transferEncoding: response.headers.get('transfer-encoding'),
+    tMs: 0,
+  });
+
   try {
+    let readIdx = 0;
     while (true) {
       const { done, value } = await reader.read();
+      diag.push({
+        kind: 'read',
+        i: readIdx++,
+        done,
+        bytes: value?.length ?? 0,
+        tMs: +(performance.now() - t0).toFixed(1),
+      });
       if (done) break;
 
       resetHeartbeat();
