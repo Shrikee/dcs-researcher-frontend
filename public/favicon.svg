@@ -1,55 +1,66 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <radialGradient id="bg" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#1a1f2e"/>
-      <stop offset="100%" stop-color="#0f1219"/>
+      <stop offset="0%" stop-color="#001a05"/>
+      <stop offset="100%" stop-color="#000c02"/>
     </radialGradient>
     <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#c4a24a" stop-opacity="0.25"/>
-      <stop offset="100%" stop-color="#c4a24a" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#00ff41" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00ff41" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sweep-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00ff41" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00ff41" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="arm" x1="50%" y1="50%" x2="50%" y2="0%">
-      <stop offset="0%" stop-color="#c9a84c" stop-opacity="1"/>
-      <stop offset="70%" stop-color="#c9a84c" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+      <stop offset="0%" stop-color="#00ff41" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#00ff41" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#00ff41" stop-opacity="0"/>
     </linearGradient>
+    <filter id="bloom">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
 
   <!-- Background circle -->
   <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
 
+  <!-- Scan trail sweep -->
+  <path d="M256,256 L256,36 A220,220 0 0,0 73,148 Z" fill="#00ff41" fill-opacity="0.07"/>
+
   <!-- Outer ring border -->
-  <circle cx="256" cy="256" r="220" fill="none" stroke="#c9a84c" stroke-opacity="0.2" stroke-width="2"/>
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#00ff41" stroke-opacity="0.25" stroke-width="2"/>
 
   <!-- Middle ring -->
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#c9a84c" stroke-opacity="0.15" stroke-width="1.5"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#00ff41" stroke-opacity="0.18" stroke-width="1.5"/>
 
   <!-- Inner ring -->
-  <circle cx="256" cy="256" r="80" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="1.5"/>
+  <circle cx="256" cy="256" r="80" fill="none" stroke="#00ff41" stroke-opacity="0.15" stroke-width="1.5"/>
 
   <!-- Crosshairs -->
-  <line x1="36" y1="256" x2="476" y2="256" stroke="#c9a84c" stroke-opacity="0.1" stroke-width="1"/>
-  <line x1="256" y1="36" x2="256" y2="476" stroke="#c9a84c" stroke-opacity="0.1" stroke-width="1"/>
-
-  <!-- Scan trail (conic sweep approximation as a filled arc) -->
-  <path d="M256,256 L256,36 A220,220 0 0,0 73,148 Z" fill="#c9a84c" fill-opacity="0.08"/>
+  <line x1="36" y1="256" x2="476" y2="256" stroke="#00ff41" stroke-opacity="0.12" stroke-width="1"/>
+  <line x1="256" y1="36" x2="256" y2="476" stroke="#00ff41" stroke-opacity="0.12" stroke-width="1"/>
 
   <!-- Sweep arm -->
-  <line x1="256" y1="256" x2="256" y2="46" stroke="url(#arm)" stroke-width="3" stroke-linecap="round"/>
+  <line x1="256" y1="256" x2="256" y2="46" stroke="url(#arm)" stroke-width="3" stroke-linecap="round" filter="url(#bloom)"/>
 
   <!-- Center glow -->
-  <circle cx="256" cy="256" r="40" fill="url(#glow)"/>
+  <circle cx="256" cy="256" r="50" fill="url(#glow)"/>
 
   <!-- Center dot -->
-  <circle cx="256" cy="256" r="8" fill="#c9a84c"/>
-  <circle cx="256" cy="256" r="12" fill="none" stroke="#c9a84c" stroke-opacity="0.3" stroke-width="1.5"/>
+  <circle cx="256" cy="256" r="8" fill="#00ff41" filter="url(#bloom)"/>
+  <circle cx="256" cy="256" r="13" fill="none" stroke="#00ff41" stroke-opacity="0.4" stroke-width="1.5"/>
 
   <!-- Blips -->
-  <circle cx="320" cy="130" r="6" fill="#c9a84c" fill-opacity="0.9"/>
-  <circle cx="320" cy="130" r="10" fill="none" stroke="#c9a84c" stroke-opacity="0.3" stroke-width="1"/>
+  <circle cx="320" cy="130" r="6" fill="#00ff41" fill-opacity="0.95" filter="url(#bloom)"/>
+  <circle cx="320" cy="130" r="11" fill="none" stroke="#00ff41" stroke-opacity="0.35" stroke-width="1"/>
 
-  <circle cx="160" cy="300" r="5" fill="#c9a84c" fill-opacity="0.6"/>
-  <circle cx="160" cy="300" r="9" fill="none" stroke="#c9a84c" stroke-opacity="0.2" stroke-width="1"/>
+  <circle cx="160" cy="300" r="5" fill="#00ff41" fill-opacity="0.65" filter="url(#bloom)"/>
+  <circle cx="160" cy="300" r="10" fill="none" stroke="#00ff41" stroke-opacity="0.25" stroke-width="1"/>
 
-  <circle cx="210" cy="190" r="4.5" fill="#c9a84c" fill-opacity="0.45"/>
+  <circle cx="210" cy="190" r="4.5" fill="#00ff41" fill-opacity="0.5"/>
 </svg>
