@@ -1098,6 +1098,34 @@ body {
   color: var(--text-primary);
 }
 
+/* --- Maintenance page extras -------------------------------- */
+.maintenance-pill {
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent-dim), transparent 75%);
+  border: 1px solid color-mix(in oklch, var(--accent-dim), transparent 60%);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: 999px;
+}
+
+.maintenance-link {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: var(--sp-2);
+}
+.maintenance-link a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.maintenance-link a:hover {
+  text-decoration: underline;
+}
+
 /* ============================================================
    UNDO TOAST
    ============================================================ */
