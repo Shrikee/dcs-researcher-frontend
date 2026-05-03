@@ -97,10 +97,18 @@ export function useStreaming(deps: StreamingDeps) {
               }));
             },
             onToolStart: (name) => {
-              updateLast((msg) => ({
-                ...msg,
-                tools: [...msg.tools, { name, status: 'running' }],
-              }));
+              updateLast((msg) => {
+                const existingIdx = msg.tools.findIndex((t) => t.name === name);
+                if (existingIdx >= 0) {
+                  const tools = [...msg.tools];
+                  tools[existingIdx] = { ...tools[existingIdx], status: 'running' };
+                  return { ...msg, tools };
+                }
+                return {
+                  ...msg,
+                  tools: [...msg.tools, { name, status: 'running' }],
+                };
+              });
             },
             onToolEnd: (name, output) => {
               updateLast((msg) => ({
