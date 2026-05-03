@@ -65,9 +65,9 @@
   --text-secondary: oklch(62% 0.008 260);
   --text-tertiary: oklch(46% 0.006 260);
 
-  --accent: oklch(76% 0.138 65);
-  --accent-hover: oklch(82% 0.138 65);
-  --accent-dim: oklch(56% 0.1 65);
+  --accent: oklch(78% 0.18 145);
+  --accent-hover: oklch(85% 0.2 145);
+  --accent-dim: oklch(56% 0.13 145);
 
   --border: oklch(24% 0.01 260);
   --border-subtle: oklch(20% 0.008 260);
@@ -91,9 +91,9 @@
   --text-secondary: oklch(42% 0.008 260);
   --text-tertiary: oklch(58% 0.006 260);
 
-  --accent: oklch(52% 0.14 65);
-  --accent-hover: oklch(46% 0.14 65);
-  --accent-dim: oklch(42% 0.1 65);
+  --accent: oklch(48% 0.17 145);
+  --accent-hover: oklch(42% 0.17 145);
+  --accent-dim: oklch(42% 0.13 145);
 
   --border: oklch(87% 0.006 75);
   --border-subtle: oklch(91% 0.004 75);
