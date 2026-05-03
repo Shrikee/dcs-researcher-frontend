@@ -29,9 +29,11 @@ export const MessageItem = memo(function MessageItem({ message, isStreaming, onR
   }, [isCurrentlyStreaming, message.content, hasError]);
 
   // Show a friendly hint if the user has been waiting a while with no content yet.
+  // Must fire well before the API heartbeat timeout (30s in api.ts) — otherwise
+  // the hint appears simultaneously with the connection-timeout error.
   useEffect(() => {
     if (isCurrentlyStreaming && !message.content && !hasError) {
-      const timer = setTimeout(() => setShowSlowHint(true), 30_000);
+      const timer = setTimeout(() => setShowSlowHint(true), 12_000);
       return () => clearTimeout(timer);
     }
     setShowSlowHint(false);
