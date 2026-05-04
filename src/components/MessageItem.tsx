@@ -13,6 +13,10 @@ export const MessageItem = memo(function MessageItem({ message, isStreaming, onR
   const isUser = message.role === 'user';
   const isCurrentlyStreaming = isStreaming && !isUser;
   const hasError = !!message.error;
+  // The backend often emits a leading whitespace-only token ("\n\n") before any
+  // real content. Treat whitespace-only content as empty so the loading state
+  // and slow-hint stay visible until something user-meaningful arrives.
+  const hasContent = message.content.trim().length > 0;
   const wasStreaming = useRef(false);
   const [justCompleted, setJustCompleted] = useState(false);
   const [showSlowHint, setShowSlowHint] = useState(false);
@@ -20,24 +24,24 @@ export const MessageItem = memo(function MessageItem({ message, isStreaming, onR
   useEffect(() => {
     if (isCurrentlyStreaming) {
       wasStreaming.current = true;
-    } else if (wasStreaming.current && message.content && !hasError) {
+    } else if (wasStreaming.current && hasContent && !hasError) {
       wasStreaming.current = false;
       setJustCompleted(true);
       const timer = setTimeout(() => setJustCompleted(false), 800);
       return () => clearTimeout(timer);
     }
-  }, [isCurrentlyStreaming, message.content, hasError]);
+  }, [isCurrentlyStreaming, hasContent, hasError]);
 
   // Show a friendly hint if the user has been waiting a while with no content yet.
   // Must fire well before the API heartbeat timeout (30s in api.ts) — otherwise
   // the hint appears simultaneously with the connection-timeout error.
   useEffect(() => {
-    if (isCurrentlyStreaming && !message.content && !hasError) {
+    if (isCurrentlyStreaming && !hasContent && !hasError) {
       const timer = setTimeout(() => setShowSlowHint(true), 12_000);
       return () => clearTimeout(timer);
     }
     setShowSlowHint(false);
-  }, [isCurrentlyStreaming, message.content, hasError]);
+  }, [isCurrentlyStreaming, hasContent, hasError]);
 
   return (
     <div
@@ -80,7 +84,7 @@ export const MessageItem = memo(function MessageItem({ message, isStreaming, onR
       )}
 
       {/* Loading indicator: streaming but no content yet */}
-      {isCurrentlyStreaming && !message.content && !hasError && (
+      {isCurrentlyStreaming && !hasContent && !hasError && (
         <>
           <div className="message__loading" aria-label="Researcher is thinking">
             <span className="message__loading-dot" />
@@ -99,7 +103,7 @@ export const MessageItem = memo(function MessageItem({ message, isStreaming, onR
       <div className="message__body">
         {isUser ? (
           <p>{message.content}</p>
-        ) : message.content ? (
+        ) : hasContent ? (
           <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
         ) : null}
       </div>
