@@ -1,7 +1,9 @@
-import { memo, useState, useEffect, useRef } from 'react';
+import { memo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import type { Message } from '../types';
+import type { Message, ToolActivity } from '../types';
+import { useJustCompletedAnimation } from '../hooks/useJustCompletedAnimation';
+import { useSlowHintTimer } from '../hooks/useSlowHintTimer';
 
 interface Props {
   message: Message;
@@ -9,110 +11,167 @@ interface Props {
   onRetry?: () => void;
 }
 
-export const MessageItem = memo(function MessageItem({ message, isStreaming, onRetry }: Props) {
+const SLOW_HINT_TEXT =
+  "Still researching — this one runs on modest local hardware, so deeper questions take a little longer. Thanks for hanging in.";
+
+export const MessageItem = memo(function MessageItem({
+  message,
+  isStreaming,
+  onRetry,
+}: Props) {
   const isUser = message.role === 'user';
   const isCurrentlyStreaming = isStreaming && !isUser;
   const hasError = !!message.error;
-  // The backend often emits a leading whitespace-only token ("\n\n") before any
-  // real content. Treat whitespace-only content as empty so the loading state
-  // and slow-hint stay visible until something user-meaningful arrives.
+  // Backend may emit leading whitespace tokens before real content. Treat
+  // whitespace-only as empty so loading-state and slow-hint stay accurate.
   const hasContent = message.content.trim().length > 0;
-  const wasStreaming = useRef(false);
-  const [justCompleted, setJustCompleted] = useState(false);
-  const [showSlowHint, setShowSlowHint] = useState(false);
 
-  useEffect(() => {
-    if (isCurrentlyStreaming) {
-      wasStreaming.current = true;
-    } else if (wasStreaming.current && hasContent && !hasError) {
-      wasStreaming.current = false;
-      setJustCompleted(true);
-      const timer = setTimeout(() => setJustCompleted(false), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [isCurrentlyStreaming, hasContent, hasError]);
+  const justCompleted = useJustCompletedAnimation(
+    isCurrentlyStreaming,
+    hasContent,
+    hasError,
+  );
+  const showSlowHint = useSlowHintTimer(
+    isCurrentlyStreaming,
+    message.content,
+    hasError,
+  );
 
-  // Show a friendly hint if the user has been waiting a while with no content yet.
-  // Must fire well before the API heartbeat timeout (30s in api.ts) — otherwise
-  // the hint appears simultaneously with the connection-timeout error.
-  useEffect(() => {
-    if (isCurrentlyStreaming && !hasContent && !hasError) {
-      const timer = setTimeout(() => setShowSlowHint(true), 12_000);
-      return () => clearTimeout(timer);
-    }
-    setShowSlowHint(false);
-  }, [isCurrentlyStreaming, hasContent, hasError]);
+  const showLoadingDots = isCurrentlyStreaming && !hasContent && !hasError;
+  const showHint = isCurrentlyStreaming && showSlowHint && hasContent && !hasError;
 
   return (
     <div
-      className={`message ${isUser ? 'message--user' : 'message--assistant'} ${
-        isCurrentlyStreaming ? 'message--streaming' : ''
-      } ${justCompleted ? 'message--completed' : ''} ${hasError ? 'message--error' : ''}`}
+      className={buildMessageClassName({
+        isUser,
+        isCurrentlyStreaming,
+        justCompleted,
+        hasError,
+      })}
     >
-      <div className="message__label">
-        <span className="message__label-dot" />
-        {isUser ? 'You' : 'Researcher'}
-      </div>
+      <MessageLabel isUser={isUser} />
 
-      {/* Tool indicators (before text content) */}
-      {!isUser && message.tools.length > 0 && (
-        <div className="message__tools">
-          {message.tools.map((tool, i) => (
-            <div key={`${tool.name}-${i}`} className="tool-indicator">
-              <span
-                className={`tool-indicator__dot tool-indicator__dot--${tool.status}`}
-              />
-              <span className="tool-indicator__name">
-                {formatToolName(tool.name)}
-                {tool.status === 'running' ? '…' : ''}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      {!isUser && message.tools.length > 0 && <ToolIndicators tools={message.tools} />}
 
-      {/* Error state */}
-      {hasError && (
-        <div className="message__error">
-          <span className="message__error-text">{message.error}</span>
-          {onRetry && (
-            <button className="message__error-retry" onClick={onRetry}>
-              Retry
-            </button>
-          )}
-        </div>
-      )}
+      {hasError && message.error && <MessageError error={message.error} onRetry={onRetry} />}
 
-      {/* Loading indicator: streaming but no content yet */}
-      {isCurrentlyStreaming && !hasContent && !hasError && (
-        <>
-          <div className="message__loading" aria-label="Researcher is thinking">
-            <span className="message__loading-dot" />
-            <span className="message__loading-dot" />
-            <span className="message__loading-dot" />
-          </div>
-          {showSlowHint && (
-            <p className="message__slow-hint" role="status">
-              Still researching — this one runs on modest local hardware, so
-              deeper questions take a little longer. Thanks for hanging in.
-            </p>
-          )}
-        </>
-      )}
+      {showLoadingDots && <LoadingDots />}
 
-      <div className="message__body">
-        {isUser ? (
-          <p>{message.content}</p>
-        ) : hasContent ? (
-          <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
-        ) : null}
-      </div>
+      <MessageBody isUser={isUser} content={message.content} hasContent={hasContent} />
+
+      {showHint && <SlowHint text={SLOW_HINT_TEXT} />}
     </div>
   );
 });
 
+// ----- sub-components ------------------------------------------------
+
+function MessageLabel({ isUser }: { isUser: boolean }) {
+  return (
+    <div className="message__label">
+      <span className="message__label-dot" />
+      {isUser ? 'You' : 'Researcher'}
+    </div>
+  );
+}
+
+function ToolIndicators({ tools }: { tools: ToolActivity[] }) {
+  return (
+    <div className="message__tools">
+      {tools.map((tool, i) => (
+        <ToolIndicator key={`${tool.name}-${i}`} tool={tool} />
+      ))}
+    </div>
+  );
+}
+
+function ToolIndicator({ tool }: { tool: ToolActivity }) {
+  return (
+    <div className="tool-indicator">
+      <span className={`tool-indicator__dot tool-indicator__dot--${tool.status}`} />
+      <span className="tool-indicator__name">
+        {formatToolName(tool.name)}
+        {tool.status === 'running' ? '…' : ''}
+      </span>
+    </div>
+  );
+}
+
+function MessageError({ error, onRetry }: { error: string; onRetry?: () => void }) {
+  return (
+    <div className="message__error">
+      <span className="message__error-text">{error}</span>
+      {onRetry && (
+        <button className="message__error-retry" onClick={onRetry}>
+          Retry
+        </button>
+      )}
+    </div>
+  );
+}
+
+function LoadingDots() {
+  return (
+    <div className="message__loading" aria-label="Researcher is thinking">
+      <span className="message__loading-dot" />
+      <span className="message__loading-dot" />
+      <span className="message__loading-dot" />
+    </div>
+  );
+}
+
+function MessageBody({
+  isUser,
+  content,
+  hasContent,
+}: {
+  isUser: boolean;
+  content: string;
+  hasContent: boolean;
+}) {
+  return (
+    <div className="message__body">
+      {isUser ? (
+        <p>{content}</p>
+      ) : hasContent ? (
+        <Markdown remarkPlugins={[remarkGfm]}>{content}</Markdown>
+      ) : null}
+    </div>
+  );
+}
+
+function SlowHint({ text }: { text: string }) {
+  return (
+    <p className="message__slow-hint" role="status">
+      {text}
+    </p>
+  );
+}
+
+// ----- helpers -------------------------------------------------------
+
+function buildMessageClassName({
+  isUser,
+  isCurrentlyStreaming,
+  justCompleted,
+  hasError,
+}: {
+  isUser: boolean;
+  isCurrentlyStreaming: boolean;
+  justCompleted: boolean;
+  hasError: boolean;
+}): string {
+  return [
+    'message',
+    isUser ? 'message--user' : 'message--assistant',
+    isCurrentlyStreaming && 'message--streaming',
+    justCompleted && 'message--completed',
+    hasError && 'message--error',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
 function formatToolName(name: string): string {
-  return name
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return name.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
