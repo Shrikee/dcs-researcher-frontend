@@ -23,9 +23,16 @@ export const MessageItem = memo(function MessageItem({
   const isUser = message.role === 'user';
   const isCurrentlyStreaming = isStreaming && !isUser;
   const hasError = !!message.error;
-  // Backend may emit leading whitespace tokens before real content. Treat
-  // whitespace-only as empty so loading-state and slow-hint stay accurate.
-  const hasContent = message.content.trim().length > 0;
+
+  const renderedContent = useThrottledStreamingContent(
+    message.content,
+    isCurrentlyStreaming,
+  );
+
+  // Gate loading-state on the throttled content (what the user actually sees),
+  // not the raw streaming buffer. Otherwise the dots vanish on the first token
+  // while react-markdown is still showing nothing, leaving a blank gap.
+  const hasContent = renderedContent.trim().length > 0;
 
   const justCompleted = useJustCompletedAnimation(
     isCurrentlyStreaming,
@@ -38,13 +45,12 @@ export const MessageItem = memo(function MessageItem({
     hasError,
   );
 
-  const renderedContent = useThrottledStreamingContent(
-    message.content,
-    isCurrentlyStreaming,
-  );
-
   const showLoadingDots = isCurrentlyStreaming && !hasContent && !hasError;
-  const showHint = isCurrentlyStreaming && showSlowHint && hasContent && !hasError;
+  // Show the slow-hint during the *waiting* phase (no real content yet) —
+  // typically while tools run or the LLM is composing its first response.
+  // Gating on `hasContent` would invert the intent, since the timer resets on
+  // every incoming token and never fires once text starts streaming.
+  const showHint = isCurrentlyStreaming && showSlowHint && !hasContent && !hasError;
 
   return (
     <div
