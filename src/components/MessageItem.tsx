@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import type { Message, ToolActivity } from '../types';
 import { useJustCompletedAnimation } from '../hooks/useJustCompletedAnimation';
 import { useSlowHintTimer } from '../hooks/useSlowHintTimer';
+import { useThrottledStreamingContent } from '../hooks/useThrottledStreamingContent';
 
 interface Props {
   message: Message;
@@ -37,6 +38,11 @@ export const MessageItem = memo(function MessageItem({
     hasError,
   );
 
+  const renderedContent = useThrottledStreamingContent(
+    message.content,
+    isCurrentlyStreaming,
+  );
+
   const showLoadingDots = isCurrentlyStreaming && !hasContent && !hasError;
   const showHint = isCurrentlyStreaming && showSlowHint && hasContent && !hasError;
 
@@ -57,7 +63,7 @@ export const MessageItem = memo(function MessageItem({
 
       {showLoadingDots && <LoadingDots />}
 
-      <MessageBody isUser={isUser} content={message.content} hasContent={hasContent} />
+      <MessageBody isUser={isUser} content={renderedContent} hasContent={hasContent} />
 
       {showHint && <SlowHint text={SLOW_HINT_TEXT} />}
     </div>

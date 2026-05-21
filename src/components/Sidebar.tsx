@@ -44,35 +44,34 @@ export function Sidebar({
       </div>
 
       <div className="sidebar__sessions">
-        {sessions.map((session) => (
-          <div
-            key={session.id}
-            className={`sidebar__session ${
-              session.id === activeSessionId ? 'sidebar__session--active' : ''
-            }`}
-            role="button"
-            tabIndex={0}
-            onClick={() => onSelectSession(session.id)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onSelectSession(session.id);
-              }
-            }}
-          >
-            <span className="sidebar__session-title">{session.title}</span>
-            <button
-              className="sidebar__session-delete"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteSession(session.id);
-              }}
-              aria-label={`Delete session: ${session.title}`}
+        {sessions.map((session) => {
+          const isActive = session.id === activeSessionId;
+          return (
+            <div
+              key={session.id}
+              className={`sidebar__session-row ${
+                isActive ? 'sidebar__session-row--active' : ''
+              }`}
             >
-              ×
-            </button>
-          </div>
-        ))}
+              <button
+                type="button"
+                className="sidebar__session"
+                onClick={() => onSelectSession(session.id)}
+                aria-current={isActive ? 'true' : undefined}
+              >
+                <span className="sidebar__session-title">{session.title}</span>
+              </button>
+              <button
+                type="button"
+                className="sidebar__session-delete"
+                onClick={() => onDeleteSession(session.id)}
+                aria-label={`Delete session: ${session.title}`}
+              >
+                ×
+              </button>
+            </div>
+          );
+        })}
 
         {sessions.length === 0 && (
           <div className="sidebar__empty">

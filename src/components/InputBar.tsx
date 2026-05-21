@@ -57,6 +57,7 @@ export const InputBar = forwardRef(function InputBar(
           ref={textareaRef}
           className={`input-bar__textarea ${isStreaming ? 'input-bar__textarea--streaming' : ''}`}
           placeholder="Ask about DCS aircraft, systems, or procedures…"
+          aria-label="Ask the DCS Researcher"
           rows={1}
           onKeyDown={handleKeyDown}
           onChange={handleChange}
