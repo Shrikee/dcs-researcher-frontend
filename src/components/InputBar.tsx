@@ -60,7 +60,6 @@ export const InputBar = forwardRef(function InputBar(
           rows={1}
           onKeyDown={handleKeyDown}
           onChange={handleChange}
-          aria-disabled={isStreaming || undefined}
         />
         {isStreaming ? (
           <button

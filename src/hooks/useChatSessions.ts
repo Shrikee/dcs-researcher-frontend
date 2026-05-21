@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { ChatSession, Message } from '../types';
 
 const STORAGE_KEY = 'dcs-sessions';
@@ -38,10 +38,24 @@ export function useChatSessions() {
   const activeSession =
     sessions.find((s) => s.id === activeSessionId) ?? null;
 
-  // Persist sessions to localStorage on every change
+  // Debounced persist: avoids serializing on every streaming token.
+  // Flushes immediately on unmount so no data is lost.
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const sessionsRef = useRef(sessions);
+  sessionsRef.current = sessions;
+
   useEffect(() => {
-    saveSessions(sessions);
+    clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => saveSessions(sessions), 500);
+    return () => clearTimeout(saveTimerRef.current);
   }, [sessions]);
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(saveTimerRef.current);
+      saveSessions(sessionsRef.current);
+    };
+  }, []);
 
   const createSession = useCallback(
     (question: string, userMsg: Message, assistantMsg: Message) => {

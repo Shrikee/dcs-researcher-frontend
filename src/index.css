@@ -51,6 +51,30 @@
   /* Layout */
   --sidebar-w: 260px;
   --chat-max-w: 740px;
+
+  /* Color token fallbacks (light theme defaults — prevents FOUC before JS applies data-theme) */
+  --bg-primary: oklch(97.5% 0.004 75);
+  --bg-secondary: oklch(94% 0.006 75);
+  --bg-tertiary: oklch(91% 0.008 75);
+  --bg-hover: oklch(89% 0.008 75);
+  --bg-active: oklch(86% 0.01 75);
+
+  --text-primary: oklch(18% 0.012 260);
+  --text-secondary: oklch(42% 0.008 260);
+  --text-tertiary: oklch(58% 0.006 260);
+
+  --accent: oklch(48% 0.17 145);
+  --accent-hover: oklch(42% 0.17 145);
+  --accent-dim: oklch(42% 0.13 145);
+
+  --border: oklch(87% 0.006 75);
+  --border-subtle: oklch(91% 0.004 75);
+
+  --success: oklch(42% 0.14 155);
+  --error: oklch(50% 0.18 25);
+
+  --code-bg: oklch(94% 0.006 75);
+  --scrollbar-thumb: oklch(78% 0.006 75);
 }
 
 /* --- Dark theme --------------------------------------------- */

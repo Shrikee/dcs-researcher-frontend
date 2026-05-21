@@ -46,10 +46,14 @@ export async function streamResearch(
   let currentEvent = '';
 
   let heartbeatTimer: ReturnType<typeof setTimeout> | undefined;
+  // Tracks whether a terminal SSE event (done/error) or timeout has been received.
+  // If the stream closes without one, we surface an error instead of silently hanging.
+  let receivedTerminal = false;
 
   const resetHeartbeat = () => {
     clearTimeout(heartbeatTimer);
     heartbeatTimer = setTimeout(() => {
+      receivedTerminal = true;
       reader.cancel();
       callbacks.onError('Connection timed out (no data received for 30s)');
     }, HEARTBEAT_TIMEOUT_MS);
@@ -57,30 +61,9 @@ export async function streamResearch(
 
   resetHeartbeat();
 
-  const t0 = performance.now();
-  const diag: Array<Record<string, unknown>> = [];
-  (window as unknown as { __streamDiag?: unknown }).__streamDiag = diag;
-  diag.push({
-    kind: 'headers',
-    status: response.status,
-    contentType: response.headers.get('content-type'),
-    contentLength: response.headers.get('content-length'),
-    contentEncoding: response.headers.get('content-encoding'),
-    transferEncoding: response.headers.get('transfer-encoding'),
-    tMs: 0,
-  });
-
   try {
-    let readIdx = 0;
     while (true) {
       const { done, value } = await reader.read();
-      diag.push({
-        kind: 'read',
-        i: readIdx++,
-        done,
-        bytes: value?.length ?? 0,
-        tMs: +(performance.now() - t0).toFixed(1),
-      });
       if (done) break;
 
       resetHeartbeat();
@@ -120,9 +103,11 @@ export async function streamResearch(
                 callbacks.onToolEnd(data.toolName, data.output ?? '');
                 break;
               case 'done':
+                receivedTerminal = true;
                 callbacks.onDone();
                 break;
               case 'error':
+                receivedTerminal = true;
                 callbacks.onError(data.message || 'Unknown error');
                 break;
             }
@@ -134,5 +119,11 @@ export async function streamResearch(
     }
   } finally {
     clearTimeout(heartbeatTimer);
+  }
+
+  // Stream closed without a terminal event — backend dropped the connection or
+  // sent no response. Surface an error rather than leaving the UI stuck.
+  if (!receivedTerminal) {
+    callbacks.onError('No response received');
   }
 }

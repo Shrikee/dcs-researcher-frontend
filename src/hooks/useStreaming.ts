@@ -145,6 +145,10 @@ export function useStreaming(deps: StreamingDeps) {
           }));
         }
         setIsStreaming(false);
+      } finally {
+        // Safety net: ensure streaming state is always cleared, even if the
+        // server closes the connection without sending a terminal SSE event.
+        setIsStreaming(false);
       }
 
       abortRef.current = null;
