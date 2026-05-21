@@ -18,6 +18,7 @@ export function useThrottledStreamingContent(
   const [throttled, setThrottled] = useState(content);
   const latestRef = useRef(content);
   const lastEmittedRef = useRef(0);
+  const hasEmittedContentRef = useRef(content.length > 0);
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -30,11 +31,27 @@ export function useThrottledStreamingContent(
       }
       setThrottled(content);
       lastEmittedRef.current = performance.now();
+      hasEmittedContentRef.current = content.length > 0;
       return;
     }
 
     const now = performance.now();
     const elapsed = now - lastEmittedRef.current;
+
+    // Flush immediately on the first non-empty content so the user sees the
+    // initial response without waiting a full throttle interval. Without this,
+    // the loading dots hide (hasContent is computed from real-time content)
+    // but the rendered Markdown stays blank for up to `intervalMs`.
+    if (!hasEmittedContentRef.current && content.length > 0) {
+      if (pendingTimerRef.current) {
+        clearTimeout(pendingTimerRef.current);
+        pendingTimerRef.current = null;
+      }
+      setThrottled(content);
+      lastEmittedRef.current = now;
+      hasEmittedContentRef.current = true;
+      return;
+    }
 
     if (elapsed >= intervalMs) {
       setThrottled(content);
